@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "stripe": "^18.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.29",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+  "dev": "ts-node src/webhook.ts"
+}
+
+}
