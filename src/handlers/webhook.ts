@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
-import { sendConfirmationEmail } from './email';
+import { sendConfirmationEmail, sendConfirmationEmailAdmin } from './email';
 import { PrismaClient } from '@prisma/client';
 import QRCode from 'qrcode';
 
@@ -28,8 +28,9 @@ const stripeWebhookHandler = async (req: Request, res: Response, next: NextFunct
     if (event.type === 'checkout.session.completed') {
         const session = event.data.object as Stripe.Checkout.Session;
         const email = session.customer_details?.email;
+        const name = session.customer_details?.name ?? "Meraki";
         const amount = (session.amount_total || 0) / 100;
-        const currency = session.currency?.toUpperCase();
+        const currency = session.currency?.toUpperCase() ?? "PLN_";
         
         // Generate a ticket
         const ticket = await prisma.ticket.create({
@@ -44,16 +45,8 @@ const stripeWebhookHandler = async (req: Request, res: Response, next: NextFunct
         const qrDataUrl = await QRCode.toDataURL(ticket.id);
         
         if (email) {
-            const html = `
-            <p>Hi,</p>
-            <p>Thank you for your purchase of <strong>${amount} ${currency}</strong>.</p>
-            <p>Here is your ticket QR code:</p>
-            <img src="${qrDataUrl}" alt="Your Ticket QR" />
-             <p>Ticket ID: ${ticket.id}</p>
-            `;
-
-            await sendConfirmationEmail(email, 'Ticket Purchase Confirmation', html);
-            await sendConfirmationEmail(
+            await sendConfirmationEmail(email, name, amount, currency, qrDataUrl, ticket );
+            await sendConfirmationEmailAdmin(
             process.env.ADMIN_EMAIL!,
             'New Ticket Purchase',
             `<p>${email} purchased ${amount} ${currency}</p>

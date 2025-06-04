@@ -21,7 +21,7 @@ dotenv_1.default.config();
 const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY);
 const prisma = new client_1.PrismaClient();
 const stripeWebhookHandler = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a, _b, _c, _d, _e;
     const sig = req.headers['stripe-signature'];
     let event;
     try {
@@ -35,8 +35,9 @@ const stripeWebhookHandler = (req, res, next) => __awaiter(void 0, void 0, void 
     if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
         const email = (_a = session.customer_details) === null || _a === void 0 ? void 0 : _a.email;
+        const name = (_c = (_b = session.customer_details) === null || _b === void 0 ? void 0 : _b.name) !== null && _c !== void 0 ? _c : "Meraki";
         const amount = (session.amount_total || 0) / 100;
-        const currency = (_b = session.currency) === null || _b === void 0 ? void 0 : _b.toUpperCase();
+        const currency = (_e = (_d = session.currency) === null || _d === void 0 ? void 0 : _d.toUpperCase()) !== null && _e !== void 0 ? _e : "PLN_";
         // Generate a ticket
         const ticket = yield prisma.ticket.create({
             data: {
@@ -47,19 +48,17 @@ const stripeWebhookHandler = (req, res, next) => __awaiter(void 0, void 0, void 
         console.log('🎟️ Ticket created:', ticket.id);
         const qrDataUrl = yield qrcode_1.default.toDataURL(ticket.id);
         if (email) {
-            const html = `
-            <p>Hi,</p>
-            <p>Thank you for your purchase of <strong>${amount} ${currency}</strong>.</p>
-            <p>Here is your ticket QR code:</p>
-            <img src="${qrDataUrl}" alt="Your Ticket QR" />
-             <p>Ticket ID: ${ticket.id}</p>
-            `;
-            yield (0, email_1.sendConfirmationEmail)(email, 'Ticket Purchase Confirmation', html);
-            yield (0, email_1.sendConfirmationEmail)(process.env.ADMIN_EMAIL, 'New Ticket Purchase', `<p>${email} purchased ${amount} ${currency}</p>
-            <p>Here is the ticket QR code:</p>
-            <img src="${qrDataUrl}" alt="Your Ticket QR" />
-             <p>Ticket ID: ${ticket.id}</p>
-            `);
+            yield (0, email_1.sendConfirmationEmail)(email, name, amount, currency, qrDataUrl, ticket);
+            yield (0, email_1.sendConfirmationEmail)(process.env.ADMIN_EMAIL, name, amount, currency, qrDataUrl, ticket);
+            // await sendConfirmationEmailAdmin(
+            // process.env.ADMIN_EMAIL!,
+            // 'New Ticket Purchase',
+            // `<p>${email} purchased ${amount} ${currency}</p>
+            // <p>Here is the ticket QR code:</p>
+            // <img src="${qrDataUrl}" alt="Your Ticket QR" />
+            //  <p>Ticket ID: ${ticket.id}</p>
+            // `
+            // );
         }
     }
     res.status(200).json({ received: true });
