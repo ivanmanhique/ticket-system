@@ -14,4 +14,8 @@ EXPOSE 3000
 
 RUN npm run build
 
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
+
 CMD ["npm", "start"]

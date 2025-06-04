@@ -13,6 +13,8 @@
     "@types/express": "^5.0.2",
     "@types/node": "^22.15.29",
     "@types/qrcode": "^1.5.5",
+    "globals": "16.2.0",
+    "prettier": "3.5.3",
     "prisma": "^6.9.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
