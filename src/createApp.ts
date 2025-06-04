@@ -11,7 +11,7 @@ const createApp = () => {
     const app = express();
 
     app.use(cors({
-        origin: ['https://ticket-sys.youthmeraki.com'], // whitelist your domain
+        origin: ['https://ticket-sys.youthmeraki.com','https://ym-ticket-verification.netlify.app'], // whitelist your domain
         methods: ['GET', 'POST'],
     }));
 
