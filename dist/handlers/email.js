@@ -12,13 +12,13 @@ mail_1.default.setApiKey(process.env.SENDGRID_API_KEY);
 function sendConfirmationEmail(to, _name, amount, currency, qrDataUrl, ticket) {
     const msg = {
         to,
-        from: process.env.ADMIN_EMAIL, // Your verified SendGrid sender
+        from: process.env.ADMIN_EMAIL,
         templateId: 'd-5147e095f0304d98bf4c326aa487d32c',
         dynamic_template_data: {
             name: _name,
             amount: amount,
             currency: currency,
-            qrCodeImage: qrDataUrl, // Data URL
+            qrCodeImage: qrDataUrl,
             ticketId: ticket.id
         }
     };
@@ -34,7 +34,7 @@ function sendConfirmationEmail(to, _name, amount, currency, qrDataUrl, ticket) {
 function sendConfirmationEmailAdmin(to, subject, body) {
     const msg = {
         to,
-        from: process.env.ADMIN_EMAIL, // Your verified SendGrid sender
+        from: process.env.ADMIN_EMAIL,
         subject,
         html: body,
     };
